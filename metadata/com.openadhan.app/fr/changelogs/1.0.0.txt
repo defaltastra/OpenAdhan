@@ -1,0 +1,11 @@
+Version initiale d'OpenAdhan
+
+Fonctionnalités :
+- Horaires de prière précis avec plus de 15 méthodes de calcul
+- Détection de localisation basée sur GPS avec géocodage inverse
+- Boussole de direction de Qibla en temps réel avec correction de déclinaison magnétique
+- Notifications d'adhan et support audio personnalisé
+- Widgets d'écran d'accueil (petit et grand)
+- Interface multilingue (Arabe, Anglais, Français)
+- Thèmes clairs et sombres
+- Confidentialité complète : hors ligne, sans suivi

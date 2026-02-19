@@ -1,0 +1,27 @@
+Application d'horaires de prière avec protection complète de la vie privée. Pas de suivi, pas de publicités, pas de comptes utilisateur.
+
+## Fonctionnalités
+- Horaires de prière précis basés sur les calculs astronomiques
+- Plus de 15 méthodes de calcul (MWL, ISNA, La Mecque, et plus)
+- Notifications personnalisables pour chaque prière
+- Enregistrement de plusieurs lieux de prière
+- Téléchargement d'adhan personnalisé ou utilisation des sons par défaut
+- Thèmes clairs et sombres
+- Support multilingue (Arabe, Anglais, Français)
+- Widgets d'écran d'accueil pour un accès rapide aux horaires
+
+## Confidentialité d'abord
+- Toutes les données stockées localement sur votre appareil
+- Aucune connexion Internet requise après la configuration initiale
+- Pas de suivi ni d'analyses
+- Pas de comptes utilisateur
+- Absolument pas de publicités
+
+## Comment utiliser
+1. Définissez votre localisation via GPS ou sélection manuelle
+2. Choisissez votre méthode de calcul préférée pour les horaires de prière
+3. Activez les notifications pour chaque heure de prière
+4. Ajoutez le son adhan préféré
+5. Ajoutez des widgets à votre écran d'accueil pour un accès rapide
+
+Tout reste sur votre appareil. Aucune synchronisation cloud, aucune analyse, aucune collecte de données utilisateur.
