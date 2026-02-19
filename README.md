@@ -1,113 +1,140 @@
-# OpenAdhan
+<div align="center">
+  <img src="android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="OpenAdhan Logo" width="120" height="120" />
+  <h1>OpenAdhan</h1>
+  <p><strong>Offline prayer times with complete privacy</strong></p>
+  <p>No tracking • No ads • No accounts</p>
+  
+  [![License](https://img.shields.io/badge/license-Non--Commercial-blue)](#license)
+  [![Platform](https://img.shields.io/badge/platform-Android-green)]()
+  [![Release](https://img.shields.io/badge/release-0.0.1-orange)]()
+</div>
 
-Offline prayer times app with complete privacy - no tracking, no ads.
+---
 
-## Features
+## ✨ Features
 
-- 📿 Accurate prayer times based on astronomical calculations
-- 🕌 15+ calculation methods (MWL, ISNA, Makkah, etc.)
-- 🔔 Customizable adhan notifications
-- 📍 Save multiple locations
-- 🎵 Upload custom adhan or use defaults
-- 🌙 Dark/light theme
-- 🔒 Private by default
+| Feature | Details |
+|---------|---------|
+| 🕐 **Prayer Times** | Accurate calculations using 15+ methods |
+| 📍 **Smart Location** | GPS auto-detection or manual selection |
+| 🔔 **Notifications** | Customizable adhan alerts per prayer |
+| 🎵 **Adhan Audio** | Use defaults or upload custom audio |
+| 🔄 **Offline First** | No internet needed after setup |
+| 🌙 **Themes** | Dark and light mode support |
+| 🧭 **Qibla Compass** | Real-time direction to Mecca |
+| 🏠 **Widgets** | Android home screen prayer widgets |
+| 🌍 **Multilingual** | English, Arabic (RTL), French |
+| 🔒 **Privacy First** | All data stored locally, no tracking |
 
-## Setup
+## 🛠️ Development
 
-1. Install dependencies:
+### Prerequisites
+- Node.js 18+
+- Android Studio (for native builds)
+- Java 11+
+
+### Web Development
 ```bash
+# Install dependencies
 npm install
-# or
-pnpm install
-```
 
-2. Run the app:
-```bash
+# Start dev server
 npm run dev
 ```
 
-## Android
+### Android APK Build
 
-Build web assets:
+**Debug Build:**
 ```bash
 npm run build
-```
-
-Sync Capacitor and build APK:
-```bash
 npx cap sync android
-cd android
-./gradlew assembleDebug
+cd android && ./gradlew assembleDebug
 ```
 
-## How to Use
+**Release Build:**
+```bash
+npm run build
+npx cap sync android
+cd android && ./gradlew assembleRelease
+```
+
+The APK will be generated in:
+- Debug: `android/app/build/outputs/apk/debug/app-debug.apk`
+- Release: `android/app/build/outputs/apk/release/app-release-unsigned.apk`
+
+## 🚀 Quick Start
 
 ### Set Your Location
-1. Go to Location tab
-2. Choose GPS auto-detection or manual country/city selection
-3. If using GPS: Allow location permission and select the detected location
-4. If manual: Select your country, then select your city
-5. Location is saved automatically
+1. Open the **Location** tab
+2. Choose **GPS auto-detection** or **manual selection**
+3. If GPS: Grant permission and confirm the detected location
+4. If manual: Select country → select city
+5. ✅ Location saved automatically
 
-### Choose Prayer Calculation
-1. Go to Settings
-2. Select your preferred calculation method
-3. Choose your madhab (Hanafi or Shafi)
-4. Settings are saved automatically
+### Configure Prayer Times
+1. Go to **Settings**
+2. Choose your **calculation method** (15+ options available)
+3. Select your **madhab** (Hanafi or Shafi'i)
+4. Settings sync automatically
 
-### Adhan Sound
-1. Go to Settings → Adhan Sound
-2. Choose from default adhans, or
-3. Click "Upload" to add your own MP3
-4. Click play button to preview
-5. Select to use for notifications
+### Set Up Adhan Notifications
+1. Open **Settings → Adhan Sound**
+2. Pick a default adhan or tap **Upload** for your own MP3
+3. Use **Play** to preview before saving
+4. Enable notifications for each prayer in Settings
 
-### Notifications
-Enable/disable notifications for each prayer individually in Settings.
+### Use Home Screen Widgets (Android)
+1. Long-press your home screen
+2. Tap **"Widgets"**
+3. Search and select **"OpenAdhan"**
+4. Choose **small** (next prayer) or **large** (full prayer list)
+5. Widgets update automatically throughout the day
 
-### Home Screen Widgets (Android)
-OpenAdhan includes home screen widgets for Android:
-1. Long press on your home screen
-2. Tap "Widgets"
-3. Search for "OpenAdhan"
-4. Choose between small widget (next prayer + countdown) or large widget (full prayer times)
-5. Tap to go to app, hold to access quick settings
+## 📸 Screenshots
 
-## Screenshots
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><strong>Main Screen</strong></td>
+      <td align="center"><strong>Onboarding</strong></td>
+      <td align="center"><strong>Settings</strong></td>
+    </tr>
+    <tr>
+      <td><img src="main.jpeg" alt="Main Screen" width="200" /></td>
+      <td><img src="onboarding.jpeg" alt="Onboarding" width="200" /></td>
+      <td><img src="settings.jpeg" alt="Settings" width="200" /></td>
+    </tr>
+  </table>
+</div>
 
-### Main Screen
-![Main Screen](main.jpeg)
+## 🔐 Privacy & Security
 
-### Onboarding Flow
-![Onboarding](onboarding.jpeg)
+✅ All data stored locally  
+✅ No internet needed after initial setup  
+✅ No tracking or analytics  
+✅ No user accounts required  
+✅ No ads whatsoever  
 
-### Settings
-![Settings](settings.jpeg)
+Your prayer times, locations, and preferences never leave your device.
 
-## Privacy
+## 🏗️ Tech Stack
 
-- All data stored locally 
-- No internet connection needed after initial load
-- No tracking or analytics
-- No user accounts
-- No ads
+- **Frontend**: React 18 + TypeScript
+- **Styling**: Tailwind CSS + Framer Motion
+- **Database**: SQLite (expo-sqlite)
+- **Routing**: React Router
+- **Build**: Vite 6
+- **Native Bridge**: Capacitor 8
 
-## Tech Stack
+## 📄 License
 
-- React + TypeScript
-- SQLite (expo-sqlite)
-- Tailwind CSS
-- Framer Motion
-- React Router
+OpenAdhan Non-Commercial License v1.0 (see [LICENSE](LICENSE))
 
-## License
+## 📱 F-Droid
 
-OpenAdhan Non-Commercial License v1.0 (see LICENSE)
-## F-Droid
+This app is designed for F-Droid distribution with no proprietary dependencies or tracking.
 
-This app is designed for F-Droid distribution. It contains no proprietary libraries or tracking code.
-
-**Installation:**
-1. Install F-Droid from https://f-droid.org/
-2. Search for "OpenAdhan" in the F-Droid app
-3. Install and enjoy!
+**Get the app:**
+1. Install [F-Droid](https://f-droid.org/)
+2. Search for "OpenAdhan"
+3. Install and enjoy offline prayer times!
