@@ -1,0 +1,202 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  
+  /* Islamic Prayer App - Light Mode: Warm brown monochrome palette */
+  --background: #FAF8F5;
+  --foreground: #3D2E28;
+  --card: #FFFFFF;
+  --card-foreground: #3D2E28;
+  --popover: #FFFFFF;
+  --popover-foreground: #3D2E28;
+  --primary: #6B4E3D;
+  --primary-foreground: #FAF8F5;
+  --secondary: #E8E0D8;
+  --secondary-foreground: #3D2E28;
+  --muted: #D4C7B8;
+  --muted-foreground: #7A6A5E;
+  --accent: #8B6F5C;
+  --accent-foreground: #FFFFFF;
+  --destructive: #A85C4B;
+  --destructive-foreground: #FFFFFF;
+  --border: rgba(61, 46, 40, 0.12);
+  --input: transparent;
+  --input-background: #F5EFE7;
+  --switch-background: #D4C7B8;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #6B4E3D;
+  
+  /* Prayer app brown palette */
+  --prayer-sand: #F5EFE7;
+  --prayer-beige: #E8E0D8;
+  --prayer-camel: #C4B5A3;
+  --prayer-mocha: #8B6F5C;
+  --prayer-deep-brown: #6B4E3D;
+  --prayer-dark-brown: #3D2E28;
+  
+  --chart-1: #6B4E3D;
+  --chart-2: #8B6F5C;
+  --chart-3: #C4B5A3;
+  --chart-4: #E8E0D8;
+  --chart-5: #7A6A5E;
+  --radius: 1rem;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #3D2E28;
+  --sidebar-primary: #6B4E3D;
+  --sidebar-primary-foreground: #FAF8F5;
+  --sidebar-accent: #FAF8F5;
+  --sidebar-accent-foreground: #3D2E28;
+  --sidebar-border: rgba(61, 46, 40, 0.12);
+  --sidebar-ring: #6B4E3D;
+}
+
+.dark {
+  /* Islamic Prayer App - Dark Mode: Deep brown tones */
+  --background: #2A1F1B;
+  --foreground: #F5EFE7;
+  --card: #3D2E28;
+  --card-foreground: #F5EFE7;
+  --popover: #3D2E28;
+  --popover-foreground: #F5EFE7;
+  --primary: #C4B5A3;
+  --primary-foreground: #2A1F1B;
+  --secondary: #4A3A30;
+  --secondary-foreground: #F5EFE7;
+  --muted: #5A4A40;
+  --muted-foreground: #B8A896;
+  --accent: #8B6F5C;
+  --accent-foreground: #F5EFE7;
+  --destructive: #C47864;
+  --destructive-foreground: #2A1F1B;
+  --border: rgba(245, 239, 231, 0.15);
+  --input: rgba(245, 239, 231, 0.1);
+  --ring: #C4B5A3;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  
+  /* Prayer app brown palette - dark mode */
+  --prayer-sand: #5A4A40;
+  --prayer-beige: #4A3A30;
+  --prayer-camel: #8B6F5C;
+  --prayer-mocha: #A89684;
+  --prayer-deep-brown: #C4B5A3;
+  --prayer-dark-brown: #3D2E28;
+  
+  --chart-1: #C4B5A3;
+  --chart-2: #A89684;
+  --chart-3: #8B6F5C;
+  --chart-4: #5A4A40;
+  --chart-5: #B8A896;
+  --sidebar: #3D2E28;
+  --sidebar-foreground: #F5EFE7;
+  --sidebar-primary: #C4B5A3;
+  --sidebar-primary-foreground: #2A1F1B;
+  --sidebar-accent: #4A3A30;
+  --sidebar-accent-foreground: #F5EFE7;
+  --sidebar-border: rgba(245, 239, 231, 0.15);
+  --sidebar-ring: #C4B5A3;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /**
+  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
+  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
+  */
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}

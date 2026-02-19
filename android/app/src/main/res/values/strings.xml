@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">OpenAdhan</string>
+    <string name="title_activity_main">OpenAdhan</string>
+    <string name="package_name">com.openadhan.app</string>
+    <string name="custom_url_scheme">com.openadhan.app</string>
+    <string name="widget_label_small">Prayer Times (Small)</string>
+    <string name="widget_label_large">Prayer Times (Large)</string>
+</resources>

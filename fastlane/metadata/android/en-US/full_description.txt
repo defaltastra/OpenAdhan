@@ -1,0 +1,27 @@
+OpenAdhan is a prayer times app with complete privacy protection. No tracking, no ads, no user accounts required.
+
+## Features
+- Accurate prayer times based on astronomical calculations
+- 15+ calculation methods (MWL, ISNA, Makkah, and more)
+- Customizable notifications for each prayer
+- Save multiple prayer locations
+- Upload custom adhan (call to prayer) audio or use defaults
+- Dark and light themes
+- Multilingual support (English, Arabic, French)
+- Home screen widgets for quick prayer time access
+
+## Privacy First
+- All data stored locally on your device
+- No internet connection required after initial setup
+- No tracking or analytics
+- No user accounts
+- No ads whatsoever
+
+## How to Use
+1. **Set Location**: Select your country and city to get accurate prayer times
+2. **Choose Calculation Method**: Pick from 15+ methods to match your local mosque's calculations
+3. **Configure Notifications**: Enable/disable adhan alerts for each prayer
+4. **Customize Adhan**: Choose from default audio files or upload your own
+5. **View Qibla**: Use the built-in compass to find the direction towards Mecca
+
+All settings and data are saved automatically on your device.
