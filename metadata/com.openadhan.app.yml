@@ -8,8 +8,16 @@ Builds:
   - versionName: '1.0'
     versionCode: 1
     commit: v1.0
-    subdir: android
+    subdir: android/app
+    init:
+      - cd ../..
+      - npm install
+    prebuild: npm run build
     gradle:
-      - release
-    prebuild: npm install && npm run build
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: '1.0'
+CurrentVersionCode: 1
 
