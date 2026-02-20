@@ -13,4 +13,3 @@ Builds:
       - release
     prebuild: npm install && npm run build
 
-AutoName: OpenAdhan
