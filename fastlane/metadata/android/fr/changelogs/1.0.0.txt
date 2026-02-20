@@ -1,0 +1,11 @@
+Version initiale d'OpenAdhan
+
+- Système complet de calcul des horaires de prière
+- Support plusieurs méthodes de calcul
+- Géolocalisation GPS avec option hors ligne
+- Boussole de la Qibla avec correction de la déclinaison magnétique
+- Notifications d'appel à la prière et lecture audio
+- Widgets d'écran d'accueil
+- Interface multilingue
+- Thèmes clair et sombre
+- Confidentialité totale et fonctionnement hors ligne

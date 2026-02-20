@@ -1,0 +1,11 @@
+Initial release of OpenAdhan
+
+- Complete prayer times calculation system
+- Multiple calculation methods support
+- GPS geolocation with offline fallback
+- Qibla compass with magnetic declination
+- Adhan notifications and audio playback
+- Home screen widgets
+- Multilingual interface
+- Dark/light themes
+- Full privacy and offline functionality

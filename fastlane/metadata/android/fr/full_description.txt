@@ -1,0 +1,13 @@
+OpenAdhan est une application d'horaires de prière avec une protection complète de la confidentialité. Pas de suivi, pas de publicités, pas de comptes utilisateur requis.
+
+Caractéristiques:
+• Horaires de prière précis basés sur des calculs astronomiques
+• Plus de 15 méthodes de calcul différentes
+• Notifications personnalisables pour chaque prière
+• Sauvegarde de plusieurs lieux de prière
+• Téléchargement d'appels à la prière personnalisés ou utilisation des paramètres par défaut
+• Thèmes clair et sombre
+• Support multilingue
+• Widgets d'écran d'accueil
+
+Toutes les données sont stockées localement sur votre appareil. Pas de synchronisation cloud, pas d'analyses, pas de collecte de données utilisateur.

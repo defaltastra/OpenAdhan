@@ -1,23 +1,6 @@
 Categories:
   - Religion
 License: Custom
-Name: OpenAdhan
-Summary: Offline prayer times with complete privacy
-Description: |
-  OpenAdhan is a prayer times app with complete privacy protection. No tracking, no ads, no user accounts required.
-  
-  Features:
-  - Accurate prayer times based on astronomical calculations
-  - 15+ calculation methods (MWL, ISNA, Makkah, and more)
-  - Customizable notifications for each prayer
-  - Save multiple prayer locations
-  - Upload custom adhan (call to prayer) audio or use defaults
-  - Dark and light themes
-  - Multilingual support (English, Arabic, French)
-  - Home screen widgets for quick prayer time access
-  
-  All data stored locally on your device. No cloud sync, no analytics, no user data collection.
-
 SourceCode: https://github.com/defaltastra/openadhan
 IssueTracker: https://github.com/defaltastra/openadhan/issues
 
