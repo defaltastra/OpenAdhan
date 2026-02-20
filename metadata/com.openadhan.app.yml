@@ -18,8 +18,8 @@ Description: |
   
   All data stored locally on your device. No cloud sync, no analytics, no user data collection.
 
-SourceCode: https://github.com/yourusername/openadhan
-IssueTracker: https://github.com/yourusername/openadhan/issues
+SourceCode: https://github.com/defaltastra/openadhan
+IssueTracker: https://github.com/defaltastra/openadhan/issues
 
 Builds:
   - versionName: '1.0'
