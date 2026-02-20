@@ -138,3 +138,9 @@ This app is designed for F-Droid distribution with no proprietary dependencies o
 1. Install [F-Droid](https://f-droid.org/)
 2. Search for "OpenAdhan"
 3. Install and enjoy offline prayer times!
+
+**F-Droid Submission:**
+- Metadata: `metadata/com.openadhan.app/` (with translations in en-US, ar, fr)
+- Build config: `metadata/com.openadhan.app.yml`
+- Package name: `com.openadhan.app`
+- Fully open source, no tracking, privacy-first design

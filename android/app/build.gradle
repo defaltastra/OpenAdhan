@@ -3,6 +3,16 @@ apply plugin: 'com.android.application'
 android {
     namespace = "com.openadhan.app"
     compileSdk = rootProject.ext.compileSdkVersion
+    
+    signingConfigs {
+        release {
+            storeFile file(System.getProperty('user.home') + '/.openadhan.keystore')
+            storePassword 'openadhan123'
+            keyAlias 'openadhan'
+            keyPassword 'openadhan123'
+        }
+    }
+    
     defaultConfig {
         applicationId "com.openadhan.app"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -20,6 +30,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }

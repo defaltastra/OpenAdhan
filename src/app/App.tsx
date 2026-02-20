@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { RouterProvider } from "react-router";
 import { Capacitor } from "@capacitor/core";
 import { LocalNotifications } from "@capacitor/local-notifications";
+import { Network } from "@capacitor/network";
 import { router } from "./routes";
 import PrayerAPI from "../backend";
 import { usePrayerTimes, useNextPrayer, useSettings } from "../backend/hooks";
@@ -56,6 +57,49 @@ function AppContent() {
     media.addListener(handler);
     return () => media.removeListener(handler);
   }, [settings?.theme]);
+
+  // Listen for network reconnection to refresh widget data
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    let unsubscribe: (() => void) | null = null;
+
+    const setupNetworkListener = async () => {
+      try {
+        unsubscribe = (await Network.addListener('networkStatusChange', (status) => {
+          if (status.connected && nextPrayer && countdown && prayers.length > 0) {
+            console.log('Network reconnected - updating widgets');
+            const now = new Date();
+            const lang = (settings?.language || "en") as "en" | "ar" | "fr";
+            const prayerList = prayers.slice(0, 5).map((prayer) => ({
+              name: translatePrayerName(prayer.name, lang),
+              time: prayer.formattedTime,
+              completed: prayer.timestamp < now.getTime(),
+            }));
+
+            updateWidgetData({
+              nextPrayerName: translatePrayerName(nextPrayer.prayer.name, lang),
+              nextPrayerTime: nextPrayer.prayer.formattedTime,
+              nextPrayerTimestamp: nextPrayer.prayer.timestamp,
+              currentTime: now.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+              }),
+              timeLeft: `${nextPrayer.countdown.hours}h ${nextPrayer.countdown.minutes}m`,
+              prayerList: JSON.stringify(prayerList),
+            });
+          }
+        })).remove;
+      } catch (error) {
+        console.error('Error setting up network listener:', error);
+      }
+    };
+
+    setupNetworkListener();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [nextPrayer, countdown, prayers, settings?.language]);
 
   useEffect(() => {
     if (!nextPrayer || !countdown || prayers.length === 0) return;
