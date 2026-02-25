@@ -48,6 +48,8 @@ export interface UserSettings {
   calculationMethod: CalculationMethod;
   madhab: Madhab;
   adhanSound: string; // filename reference to adhan_files
+  adhanPlayMode: 'full' | 'sample'; // 'full' plays entire adhan, 'sample' plays first 5 seconds
+  playAdhanOnNotification: boolean; // Whether to play adhan when notification fires
   notificationsEnabled: boolean;
   notification24Hour: boolean;
   notificationFajr: boolean;

@@ -79,6 +79,22 @@ async function createTables(): Promise<void> {
     // Column already exists or migration not needed.
   }
 
+  try {
+    await database.execAsync(
+      "ALTER TABLE user_settings ADD COLUMN adhan_play_mode TEXT NOT NULL DEFAULT 'full';"
+    );
+  } catch (error) {
+    // Column already exists or migration not needed.
+  }
+
+  try {
+    await database.execAsync(
+      "ALTER TABLE user_settings ADD COLUMN play_adhan_on_notification INTEGER NOT NULL DEFAULT 1;"
+    );
+  } catch (error) {
+    // Column already exists or migration not needed.
+  }
+
   // Locations table
   await database.execAsync(`
     CREATE TABLE IF NOT EXISTS locations (

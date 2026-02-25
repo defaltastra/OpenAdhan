@@ -49,6 +49,11 @@ export async function initDatabase(): Promise<IDBDatabase> {
         adhanStore.createIndex('filename', 'filename', { unique: true });
       }
 
+      // Prayer times cache store
+      if (!database.objectStoreNames.contains('prayer_times_cache')) {
+        database.createObjectStore('prayer_times_cache', { keyPath: 'key' });
+      }
+
       // Migration from version 1 to 2: fix adhan file paths
       if (oldVersion < 2) {
         const adhanStore = transaction.objectStore('adhan_files');

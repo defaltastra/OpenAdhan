@@ -158,6 +158,8 @@ export function SettingsScreen() {
     }
   };
 
+
+
   if (!settings) {
     return (
       <div className="min-h-full flex items-center justify-center">
@@ -344,6 +346,105 @@ export function SettingsScreen() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Adhan Play Mode */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+            <Volume2 className="w-4 h-4 text-primary" />
+          </div>
+          <h3 className="text-sm text-muted-foreground">Adhan Playback Mode</h3>
+        </div>
+        <div className="space-y-2">
+          {[
+            { key: 'full', label: 'Full Adhan', description: 'Play the complete adhan' },
+            { key: 'sample', label: '5-Second Sample', description: 'Play first 5 seconds only' },
+          ].map((mode) => {
+            const isSelected = settings.adhanPlayMode === mode.key;
+            return (
+              <button
+                key={mode.key}
+                onClick={() => updateSettings({ adhanPlayMode: mode.key as 'full' | 'sample' })}
+                className={`
+                  w-full p-4 rounded-2xl border-2 transition-all cursor-pointer
+                  ${
+                    isSelected
+                      ? "border-primary bg-primary/5 shadow-md"
+                      : "border-border bg-card hover:border-primary/30"
+                  }
+                `}
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`
+                    w-12 h-12 rounded-full flex items-center justify-center
+                    ${isSelected ? "bg-primary/10" : "bg-secondary"}
+                  `}
+                  >
+                    <Volume2
+                      className={`w-5 h-5 ${
+                        isSelected ? "text-primary" : "text-muted-foreground"
+                      }`}
+                    />
+                  </div>
+
+                  <div className="flex-1 text-left">
+                    <h3
+                      className={`font-medium mb-0.5 ${
+                        isSelected ? "text-primary" : "text-foreground"
+                      }`}
+                    >
+                      {mode.label}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {mode.description}
+                    </p>
+                  </div>
+
+                  <div
+                    className={`
+                    w-6 h-6 rounded-full border-2 flex items-center justify-center
+                    ${isSelected ? "border-primary" : "border-muted"}
+                  `}
+                  >
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-3 h-3 rounded-full bg-primary"
+                      />
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Play Adhan on Notification */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+            <Volume2 className="w-4 h-4 text-primary" />
+          </div>
+          <h3 className="text-sm text-muted-foreground">Adhan Audio</h3>
+        </div>
+        <div className="bg-card rounded-2xl p-4 shadow-sm">
+          <div className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : ""}`}>
+            <div className="flex-1">
+              <span className="text-sm font-medium">Play Adhan on Notification</span>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Play adhan audio when prayer time arrives
+              </p>
+            </div>
+            <Switch
+              checked={settings.playAdhanOnNotification}
+              onCheckedChange={(checked) => updateSettings({ playAdhanOnNotification: checked })}
+            />
+          </div>
         </div>
       </div>
 

@@ -6,6 +6,7 @@ import { getDatabase, getAllFromStore, getByIdFromStore, addToStore, deleteFromS
 import { AdhanFile } from './types';
 
 let currentAudio: HTMLAudioElement | null = null;
+let durationTimeout: NodeJS.Timeout | null = null;
 
 /**
  * Initialize audio (no-op for web)
@@ -54,80 +55,133 @@ export async function addAdhanFile(adhanFile: Omit<AdhanFile, 'id' | 'createdAt'
 
 /**
  * Play adhan by filename
+ * @param filename - The filename of the adhan to play
+ * @param durationLimitSeconds - Optional duration limit in seconds (e.g., 5 for sample)
  */
-export async function playAdhanByFilename(filename: string): Promise<void> {
+export async function playAdhanByFilename(filename: string, durationLimitSeconds?: number): Promise<void> {
+  console.log(`[Adhan] Attempting to play: ${filename}`);
   const adhanFile = await getAdhanFileByFilename(filename);
   if (!adhanFile) {
-    throw new Error(`Adhan file not found: ${filename}`);
+    const err = `Adhan file not found: ${filename}`;
+    console.error(`[Adhan] ${err}`);
+    throw new Error(err);
   }
-  await playAdhan(adhanFile);
+  console.log(`[Adhan] Found adhan file:`, adhanFile);
+  await playAdhan(adhanFile, durationLimitSeconds);
 }
 
 /**
  * Play adhan
+ * @param adhanFile - The adhan file to play
+ * @param durationLimitSeconds - Optional duration limit in seconds (e.g., 5 for sample)
  */
-export async function playAdhan(adhanFile: AdhanFile): Promise<void> {
+export async function playAdhan(adhanFile: AdhanFile, durationLimitSeconds?: number): Promise<void> {
   try {
+    console.log(`[Adhan] Starting playback for: ${adhanFile.name}`);
     await stopAdhan();
     
     currentAudio = new Audio();
+    
+    // Convert relative paths to absolute URLs
+    let audioUrl = adhanFile.path;
+    if (audioUrl && !audioUrl.startsWith('http') && !audioUrl.startsWith('blob:')) {
+      // For relative paths, construct absolute URL
+      if (audioUrl.startsWith('/')) {
+        audioUrl = window.location.origin + audioUrl;
+      } else {
+        audioUrl = window.location.origin + '/' + audioUrl;
+      }
+    }
+    
+    console.log(`[Adhan] Audio URL: ${audioUrl}`);
+    
+    // Set up error handler BEFORE setting src
+    let errorOccurred = false;
+    currentAudio.addEventListener('error', (e: Event) => {
+      errorOccurred = true;
+      const target = e.target as HTMLAudioElement;
+      const error = target.error;
+      let errorMessage = 'Unknown error';
+      
+      if (error) {
+        switch (error.code) {
+          case MediaError.MEDIA_ERR_ABORTED:
+            errorMessage = 'Playback aborted';
+            break;
+          case MediaError.MEDIA_ERR_NETWORK:
+            errorMessage = 'Network error - file not accessible';
+            break;
+          case MediaError.MEDIA_ERR_DECODE:
+            errorMessage = 'Decoding error - file may be corrupted';
+            break;
+          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            errorMessage = 'Audio format not supported';
+            break;
+        }
+      }
+      
+      console.error(`[Adhan] Error (${error?.code}): ${errorMessage}`);
+      console.error(`[Adhan] Tried to load: ${audioUrl}`);
+    }, { once: true });
     
     // Wait for the audio to load
     await new Promise<void>((resolve, reject) => {
       if (!currentAudio) return reject(new Error('Audio element not created'));
       
-      currentAudio.addEventListener('error', (e: Event) => {
-        const target = e.target as HTMLAudioElement;
-        const error = target.error;
-        let errorMessage = 'Unknown error';
-        
-        if (error) {
-          switch (error.code) {
-            case MediaError.MEDIA_ERR_ABORTED:
-              errorMessage = 'Playback aborted';
-              break;
-            case MediaError.MEDIA_ERR_NETWORK:
-              errorMessage = 'Network error';
-              break;
-            case MediaError.MEDIA_ERR_DECODE:
-              errorMessage = 'Decoding error';
-              break;
-            case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-              errorMessage = 'Audio format not supported or file not found';
-              break;
-          }
-        }
-        
-        console.error('Audio error:', errorMessage);
-        console.error('Failed to load:', adhanFile.path);
-        console.error('Error code:', error?.code);
-        reject(new Error(`${errorMessage}: ${adhanFile.path}`));
-      });
+      const timeoutId = setTimeout(() => {
+        console.error(`[Adhan] Load timeout - file may not exist or is not accessible`);
+        reject(new Error('Audio load timeout'));
+      }, 5000);
       
-      currentAudio.addEventListener('canplaythrough', () => {
+      currentAudio!.addEventListener('canplaythrough', () => {
+        clearTimeout(timeoutId);
+        console.log(`[Adhan] Audio loaded successfully`);
         resolve();
       }, { once: true });
       
+      currentAudio!.addEventListener('loadeddata', () => {
+        console.log(`[Adhan] Data loaded, playing...`);
+      }, { once: true });
+      
       // Set the source after listeners are attached
-      currentAudio.src = adhanFile.path;
-      currentAudio.load();
+      console.log(`[Adhan] Setting audio source...`);
+      currentAudio!.src = audioUrl;
+      currentAudio!.load();
     });
     
     // Now play the audio
-    await currentAudio.play();
+    console.log(`[Adhan] Calling play()...`);
+    const playPromise = currentAudio.play();
     
-    console.log(`Playing adhan: ${adhanFile.name} from ${adhanFile.path}`);
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => console.log(`[Adhan] Playback started successfully`))
+        .catch((error) => console.error(`[Adhan] Play promise rejected:`, error));
+    }
+    
+    // Set up duration limit if specified
+    if (durationLimitSeconds && durationLimitSeconds > 0) {
+      durationTimeout = setTimeout(async () => {
+        console.log(`[Adhan] Duration limit reached, stopping playback`);
+        await stopAdhan();
+      }, durationLimitSeconds * 1000);
+    }
+    
+    console.log(`[Adhan] ✓ Playing: ${adhanFile.name}${durationLimitSeconds ? ` (${durationLimitSeconds}s)` : ' (full)'}`);
   } catch (error) {
-    console.error('Error playing adhan:', error);
-    console.error('Path:', adhanFile.path);
+    console.error('[Adhan] Fatal error:', error);
+    console.error('[Adhan] Adhan file:', adhanFile);
     throw error;
   }
 }
 
 /**
  * Play from asset (same as playAdhan for web)
+ * @param assetSource - The asset source
+ * @param name - The name of the adhan
+ * @param durationLimitSeconds - Optional duration limit in seconds (e.g., 5 for sample)
  */
-export async function playAdhanFromAsset(assetSource: string, name: string = 'Adhan'): Promise<void> {
+export async function playAdhanFromAsset(assetSource: string, name: string = 'Adhan', durationLimitSeconds?: number): Promise<void> {
   try {
     await stopAdhan();
     
@@ -154,7 +208,15 @@ export async function playAdhanFromAsset(assetSource: string, name: string = 'Ad
     });
     
     await currentAudio.play();
-    console.log(`Playing adhan from asset: ${assetSource}`);
+    
+    // Set up duration limit if specified
+    if (durationLimitSeconds && durationLimitSeconds > 0) {
+      durationTimeout = setTimeout(async () => {
+        await stopAdhan();
+      }, durationLimitSeconds * 1000);
+    }
+    
+    console.log(`Playing adhan from asset: ${assetSource}${durationLimitSeconds ? ` (limited to ${durationLimitSeconds}s)` : ''}`);
   } catch (error) {
     console.error('Error playing adhan:', error);
     throw error;
@@ -165,6 +227,12 @@ export async function playAdhanFromAsset(assetSource: string, name: string = 'Ad
  * Stop adhan
  */
 export async function stopAdhan(): Promise<void> {
+  // Clear any pending duration timeout
+  if (durationTimeout) {
+    clearTimeout(durationTimeout);
+    durationTimeout = null;
+  }
+  
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.currentTime = 0;

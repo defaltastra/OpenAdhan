@@ -18,6 +18,11 @@ import { AdhanFile } from './types';
 let currentSound: Audio.Sound | null = null;
 
 /**
+ * Timeout for stopping audio after duration limit
+ */
+let durationTimeout: NodeJS.Timeout | null = null;
+
+/**
  * Map database row to AdhanFile object
  */
 function mapRowToAdhanFile(row: any): AdhanFile {
@@ -113,22 +118,31 @@ export async function addAdhanFile(adhanFile: Omit<AdhanFile, 'id' | 'createdAt'
 
 /**
  * Play adhan by filename
+ * @param filename - The filename of the adhan to play
+ * @param durationLimitSeconds - Optional duration limit in seconds (e.g., 5 for sample)
  */
-export async function playAdhanByFilename(filename: string): Promise<void> {
+export async function playAdhanByFilename(filename: string, durationLimitSeconds?: number): Promise<void> {
+  console.log(`[Adhan] Attempting to play: ${filename}`);
   const adhanFile = await getAdhanFileByFilename(filename);
   
   if (!adhanFile) {
-    throw new Error(`Adhan file not found: ${filename}`);
+    const err = `Adhan file not found: ${filename}`;
+    console.error(`[Adhan] ${err}`);
+    throw new Error(err);
   }
 
-  await playAdhan(adhanFile);
+  console.log(`[Adhan] Found adhan file:`, adhanFile);
+  await playAdhan(adhanFile, durationLimitSeconds);
 }
 
 /**
  * Play adhan from AdhanFile object
+ * @param adhanFile - The adhan file to play
+ * @param durationLimitSeconds - Optional duration limit in seconds (e.g., 5 for sample)
  */
-export async function playAdhan(adhanFile: AdhanFile): Promise<void> {
+export async function playAdhan(adhanFile: AdhanFile, durationLimitSeconds?: number): Promise<void> {
   try {
+    console.log(`[Adhan] Starting playback for: ${adhanFile.name}`);
     // Stop any currently playing sound
     await stopAdhan();
 
@@ -144,9 +158,19 @@ export async function playAdhan(adhanFile: AdhanFile): Promise<void> {
 
     currentSound = sound;
     
-    console.log(`Playing adhan: ${adhanFile.name}`);
+    // Set up duration limit if specified
+    if (durationLimitSeconds && durationLimitSeconds > 0) {
+      console.log(`[Adhan] Setting duration limit: ${durationLimitSeconds}s`);
+      durationTimeout = setTimeout(async () => {
+        console.log(`[Adhan] Duration limit reached, stopping playback`);
+        await stopAdhan();
+      }, durationLimitSeconds * 1000);
+    }
+    
+    console.log(`[Adhan] ✓ Playing: ${adhanFile.name}${durationLimitSeconds ? ` (${durationLimitSeconds}s)` : ' (full)'}`);
   } catch (error) {
-    console.error('Error playing adhan:', error);
+    console.error(`[Adhan] Fatal error:`, error);
+    console.error(`[Adhan] Adhan file:`, adhanFile);
     throw error;
   }
 }
@@ -154,9 +178,13 @@ export async function playAdhan(adhanFile: AdhanFile): Promise<void> {
 /**
  * Play adhan from local asset
  * For bundled assets in React Native
+ * @param assetSource - The asset source
+ * @param name - The name of the adhan
+ * @param durationLimitSeconds - Optional duration limit in seconds (e.g., 5 for sample)
  */
-export async function playAdhanFromAsset(assetSource: any, name: string = 'Adhan'): Promise<void> {
+export async function playAdhanFromAsset(assetSource: any, name: string = 'Adhan', durationLimitSeconds?: number): Promise<void> {
   try {
+    console.log(`[Adhan] Playing from asset: ${name}`);
     await stopAdhan();
     await initializeAudio();
 
@@ -168,9 +196,18 @@ export async function playAdhanFromAsset(assetSource: any, name: string = 'Adhan
 
     currentSound = sound;
     
-    console.log(`Playing adhan: ${name}`);
+    // Set up duration limit if specified
+    if (durationLimitSeconds && durationLimitSeconds > 0) {
+      console.log(`[Adhan] Setting duration limit: ${durationLimitSeconds}s`);
+      durationTimeout = setTimeout(async () => {
+        console.log(`[Adhan] Duration limit reached, stopping playback`);
+        await stopAdhan();
+      }, durationLimitSeconds * 1000);
+    }
+    
+    console.log(`[Adhan] ✓ Playing: ${name}${durationLimitSeconds ? ` (${durationLimitSeconds}s)` : ' (full)'}`);
   } catch (error) {
-    console.error('Error playing adhan from asset:', error);
+    console.error('[Adhan] Error playing from asset:', error);
     throw error;
   }
 }
@@ -179,6 +216,12 @@ export async function playAdhanFromAsset(assetSource: any, name: string = 'Adhan
  * Stop currently playing adhan
  */
 export async function stopAdhan(): Promise<void> {
+  // Clear any pending duration timeout
+  if (durationTimeout) {
+    clearTimeout(durationTimeout);
+    durationTimeout = null;
+  }
+  
   if (currentSound) {
     try {
       await currentSound.stopAsync();

@@ -44,3 +44,5 @@ export * as LocationsAPI from './locationsApi.web';
 export * as AdhanPlayer from './adhanPlayer.web';
 export * as PrayerCalculator from './prayerCalculator';
 export * as Database from './database.web';
+export * as NetworkMonitor from './networkMonitor';
+export * as PrayerTimesSync from './prayerTimesSync';

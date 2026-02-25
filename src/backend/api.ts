@@ -38,6 +38,7 @@ import {
   deleteLocation,
   searchLocations,
   clearAllLocations,
+  fetchCitiesFromAPI,
 } from './locationsApi.web';
 import {
   calculatePrayerTimes,
@@ -65,6 +66,7 @@ import {
   cleanupAudio,
   deleteAdhanFile,
 } from './adhanPlayer.web';
+import { initializeNetworkMonitoring, cleanupNetworkMonitoring } from './networkMonitor';
 
 import {
   UserSettings,
@@ -94,6 +96,7 @@ class PrayerTimesAPI {
     try {
       await initDatabase();
       await initializeAudio();
+      await initializeNetworkMonitoring();
       this.initialized = true;
       console.log('Prayer Times API initialized successfully');
     } catch (error) {
@@ -226,7 +229,8 @@ class PrayerTimesAPI {
    */
   async playSelectedAdhan(): Promise<void> {
     const settings = await getUserSettings();
-    await playAdhanByFilename(settings.adhanSound);
+    const durationLimit = settings.adhanPlayMode === 'sample' ? 5 : undefined;
+    await playAdhanByFilename(settings.adhanSound, durationLimit);
   }
 
   /**
@@ -257,6 +261,7 @@ class PrayerTimesAPI {
    */
   async cleanup(): Promise<void> {
     await cleanupAudio();
+    await cleanupNetworkMonitoring();
     await closeDatabase();
     this.initialized = false;
   }
@@ -283,6 +288,7 @@ class PrayerTimesAPI {
     delete: deleteLocation,
     search: searchLocations,
     clearAll: clearAllLocations,
+    fetchFromAPI: fetchCitiesFromAPI,
   };
 
   adhan = {

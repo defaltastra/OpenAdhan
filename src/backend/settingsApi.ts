@@ -15,6 +15,8 @@ function mapRowToSettings(row: any): UserSettings {
     calculationMethod: row.calculation_method as CalculationMethod,
     madhab: row.madhab as Madhab,
     adhanSound: row.adhan_sound,
+    adhanPlayMode: (row.adhan_play_mode || 'full') as 'full' | 'sample',
+    playAdhanOnNotification: row.play_adhan_on_notification !== undefined ? Boolean(row.play_adhan_on_notification) : true,
     notificationsEnabled: Boolean(row.notifications_enabled),
     notification24Hour: Boolean(row.notification_24_hour),
     notificationFajr: Boolean(row.notification_fajr),
@@ -46,6 +48,8 @@ export async function getUserSettings(): Promise<UserSettings> {
       calculationMethod: CalculationMethod.MWL,
       madhab: Madhab.SHAFI,
       adhanSound: 'default',
+      adhanPlayMode: 'full',
+      playAdhanOnNotification: true,
       notificationsEnabled: true,
       notification24Hour: true,
       notificationFajr: true,
@@ -82,6 +86,8 @@ export async function updateUserSettings(settings: Partial<UserSettings>): Promi
         calculation_method = ?,
         madhab = ?,
         adhan_sound = ?,
+        adhan_play_mode = ?,
+        play_adhan_on_notification = ?,
         notifications_enabled = ?,
         notification_24_hour = ?,
         notification_fajr = ?,
@@ -98,6 +104,8 @@ export async function updateUserSettings(settings: Partial<UserSettings>): Promi
         updatedSettings.calculationMethod,
         updatedSettings.madhab,
         updatedSettings.adhanSound,
+        updatedSettings.adhanPlayMode,
+        updatedSettings.playAdhanOnNotification ? 1 : 0,
         updatedSettings.notificationsEnabled ? 1 : 0,
         updatedSettings.notification24Hour ? 1 : 0,
         updatedSettings.notificationFajr ? 1 : 0,
@@ -118,6 +126,8 @@ export async function updateUserSettings(settings: Partial<UserSettings>): Promi
         calculation_method,
         madhab,
         adhan_sound,
+        adhan_play_mode,
+        play_adhan_on_notification,
         notifications_enabled,
         notification_24_hour,
         notification_fajr,
@@ -128,11 +138,13 @@ export async function updateUserSettings(settings: Partial<UserSettings>): Promi
         use_12_hour_format,
         language,
         theme
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         updatedSettings.calculationMethod,
         updatedSettings.madhab,
         updatedSettings.adhanSound,
+        updatedSettings.adhanPlayMode,
+        updatedSettings.playAdhanOnNotification ? 1 : 0,
         updatedSettings.notificationsEnabled ? 1 : 0,
         updatedSettings.notification24Hour ? 1 : 0,
         updatedSettings.notificationFajr ? 1 : 0,
@@ -203,12 +215,14 @@ export async function resetSettings(): Promise<UserSettings> {
       calculation_method,
       madhab,
       adhan_sound,
+      adhan_play_mode,
+      play_adhan_on_notification,
       notifications_enabled,
       notification_24_hour,
       use_12_hour_format,
       theme
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [CalculationMethod.MWL, Madhab.SHAFI, 'default', 1, 1, 1, 'light']
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [CalculationMethod.MWL, Madhab.SHAFI, 'default', 'full', 1, 1, 1, 1, 'light']
   );
 
   return await getUserSettings();
