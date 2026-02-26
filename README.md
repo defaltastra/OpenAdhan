@@ -128,7 +128,7 @@ Your prayer times, locations, and preferences never leave your device.
 
 ## 📄 License
 
-OpenAdhan Non-Commercial License v1.0 (see [LICENSE](LICENSE))
+MIT (see [LICENSE](LICENSE))
 
 ## 📱 F-Droid
 
