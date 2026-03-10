@@ -7,6 +7,10 @@ import { fetchPrayerTimes } from './aladhanApi';
 import { getAllLocations, getActiveLocation } from './locationsApi.web';
 import { getUserSettings } from './settingsApi.web';
 import { getDatabase } from './database.web';
+import { cachePrayerTimes, getCachedPrayerTimes } from './prayerTimesCache';
+
+// Re-export so callers that previously imported these from here still work
+export { cachePrayerTimes, getCachedPrayerTimes };
 
 const PRAYER_TIMES_STORE = 'prayer_times_cache';
 const SYNC_TIMESTAMP_KEY = 'last_sync_timestamp';
@@ -20,70 +24,6 @@ export async function initializePrayerTimesCache(): Promise<void> {
   // Create object store if it doesn't exist (for IndexedDB)
   if (!db.objectStoreNames.contains(PRAYER_TIMES_STORE)) {
     console.log('Prayer times cache store already exists');
-  }
-}
-
-/**
- * Save prayer times to local cache
- */
-export async function cachePrayerTimes(
-  locationId: number,
-  date: string, // YYYY-MM-DD format
-  prayerTimesData: any
-): Promise<void> {
-  try {
-    const db = await getDatabase();
-    const cacheKey = `${locationId}-${date}`;
-    
-    const transaction = db.transaction([PRAYER_TIMES_STORE], 'readwrite');
-    const store = transaction.objectStore(PRAYER_TIMES_STORE);
-    
-    await new Promise<void>((resolve, reject) => {
-      const request = store.put({
-        key: cacheKey,
-        locationId,
-        date,
-        data: prayerTimesData,
-        cachedAt: new Date().toISOString(),
-      });
-      
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-    
-    console.log(`Cached prayer times for location ${locationId} on ${date}`);
-  } catch (error) {
-    console.error('Error caching prayer times:', error);
-  }
-}
-
-/**
- * Get cached prayer times
- */
-export async function getCachedPrayerTimes(locationId: number, date: string): Promise<any | null> {
-  try {
-    const db = await getDatabase();
-    const cacheKey = `${locationId}-${date}`;
-    
-    const transaction = db.transaction([PRAYER_TIMES_STORE], 'readonly');
-    const store = transaction.objectStore(PRAYER_TIMES_STORE);
-    
-    return new Promise<any>((resolve) => {
-      const request = store.get(cacheKey);
-      request.onsuccess = () => {
-        const result = request.result;
-        if (result) {
-          console.log(`Retrieved cached prayer times for ${date}`);
-          resolve(result.data);
-        } else {
-          resolve(null);
-        }
-      };
-      request.onerror = () => resolve(null);
-    });
-  } catch (error) {
-    console.error('Error retrieving cached prayer times:', error);
-    return null;
   }
 }
 

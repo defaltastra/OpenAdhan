@@ -4,6 +4,7 @@
  */
 
 import { CalculationMethod, Madhab, PrayerName, PrayerTime, DailyPrayerTimes, Location } from './types';
+import { cachePrayerTimes, getCachedPrayerTimes } from './prayerTimesCache';
 
 const API_BASE = 'https://api.aladhan.com/v1';
 
@@ -101,15 +102,17 @@ export async function fetchPrayerTimes(
   date: Date,
   use12HourFormat: boolean = false
 ): Promise<DailyPrayerTimes> {
+  // Pre-compute date strings outside try/catch so they are available in both branches
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const dateStr = `${day}-${month}-${year}`;       // DD-MM-YYYY for Aladhan API
+  const cacheDate = `${year}-${month}-${day}`;      // YYYY-MM-DD for cache key
+  const locationId = location.id ?? 0;
+
   try {
     const method = METHOD_MAP[calculationMethod] || 3; // Default to MWL
     const school = MADHAB_MAP[madhab] || 0; // Default to Shafi
-    
-    // Format date as DD-MM-YYYY
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const dateStr = `${day}-${month}-${year}`;
     
     // Build API URL
     let url: string;
@@ -165,7 +168,7 @@ export async function fetchPrayerTimes(
       location.longitude || data.data.meta.longitude
     );
     
-    return {
+    const result: DailyPrayerTimes = {
       date,
       location: {
         ...location,
@@ -176,8 +179,25 @@ export async function fetchPrayerTimes(
       prayers,
       qiblaDirection,
     };
+
+    // Persist to offline cache (fire-and-forget — never block the return)
+    cachePrayerTimes(locationId, cacheDate, result).catch(() => {});
+
+    return result;
   } catch (error) {
     console.error('Error fetching prayer times from Aladhan:', error);
+
+    // Network failed — try the local cache before giving up
+    try {
+      const cached = await getCachedPrayerTimes(locationId, cacheDate);
+      if (cached) {
+        console.log(`[offline] Serving cached prayer times for ${cacheDate}`);
+        return cached as DailyPrayerTimes;
+      }
+    } catch {
+      // Cache read failed — fall through to original error
+    }
+
     throw error;
   }
 }
