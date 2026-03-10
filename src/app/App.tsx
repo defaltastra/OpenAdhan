@@ -14,7 +14,6 @@ function AppContent() {
   const { prayers } = usePrayerTimes();
   const { nextPrayer, countdown } = useNextPrayer();
   const lastWidgetMinute = useRef<string | null>(null);
-  const lastPlayedRef = useRef<string | null>(null);
 
   // Apply language and direction globally
   useEffect(() => {
@@ -146,25 +145,37 @@ function AppContent() {
       const permission = await LocalNotifications.checkPermissions();
       if (permission.display !== "granted") return;
 
-      await LocalNotifications.createChannel({
-        id: "prayer",
-        name: "Prayer Times",
-        importance: 5,
-        sound: undefined,
-        vibration: true,
-      });
-
-      await LocalNotifications.createChannel({
-        id: "prayer-adhan",
-        name: "Prayer Times (Adhan)",
-        importance: 5,
-        sound: "adhan",
-        vibration: true,
-      });
+      // Create native notification channels for each adhan variant.
+      // Sounds are baked into res/raw so they play even when the app is killed.
+      const channels = [
+        { id: "prayer", name: "Prayer Times (silent)", sound: undefined },
+        { id: "prayer-default-full", name: "Prayer Times – Default (Full)", sound: "adhan_default" },
+        { id: "prayer-default-sample", name: "Prayer Times – Default (5s)", sound: "adhan_default_sample" },
+        { id: "prayer-madinah-full", name: "Prayer Times – Madinah (Full)", sound: "adhan_madinah" },
+        { id: "prayer-madinah-sample", name: "Prayer Times – Madinah (5s)", sound: "adhan_madinah_sample" },
+      ];
+      for (const ch of channels) {
+        await LocalNotifications.createChannel({
+          id: ch.id,
+          name: ch.name,
+          importance: 5,
+          sound: ch.sound,
+          vibration: true,
+        });
+      }
 
       const pending = await LocalNotifications.getPending();
       if (pending.notifications.length > 0) {
         await LocalNotifications.cancel(pending);
+      }
+
+      // Pick the right channel based on user settings
+      let channelId = "prayer";
+      if (settings.playAdhanOnNotification) {
+        const isDefault = !settings.adhanSound || settings.adhanSound === "default.mp3";
+        const sound = isDefault ? "default" : "madinah";
+        const mode = settings.adhanPlayMode === "sample" ? "sample" : "full";
+        channelId = `prayer-${sound}-${mode}`;
       }
 
       const now = Date.now();
@@ -183,7 +194,7 @@ function AppContent() {
           title: translatePrayerName(prayer.name, (settings.language || "en") as "en" | "ar" | "fr"),
           body: "Prayer time",
           schedule: { at: new Date(prayer.timestamp) },
-          channelId: settings.playAdhanOnNotification ? "prayer-adhan" : "prayer",
+          channelId,
         }));
 
       if (notifications.length > 0) {
@@ -193,164 +204,6 @@ function AppContent() {
 
     scheduleNotifications();
   }, [settings, prayers]);
-
-  useEffect(() => {
-    if (!settings) return;
-    if (!settings.notificationsEnabled) return;
-    if (!settings.playAdhanOnNotification) return;
-    if (prayers.length === 0) return;
-
-    // Find next prayer and set up precise timeout
-    const setupPreciseNotifications = () => {
-      const now = Date.now();
-      let nextPrayerTime = null;
-
-      // Find next prayer that should trigger notification
-      for (const prayer of prayers) {
-        if (prayer.name === "Sunrise") continue;
-        if (prayer.timestamp <= now) continue; // Prayer already passed
-
-        // Check if notifications for this prayer are enabled
-        if (
-          (prayer.name === "Fajr" && !settings.notificationFajr) ||
-          (prayer.name === "Dhuhr" && !settings.notificationDhuhr) ||
-          (prayer.name === "Asr" && !settings.notificationAsr) ||
-          (prayer.name === "Maghrib" && !settings.notificationMaghrib) ||
-          (prayer.name === "Isha" && !settings.notificationIsha)
-        ) {
-          continue;
-        }
-
-        nextPrayerTime = prayer.timestamp;
-        break;
-      }
-
-      if (!nextPrayerTime) return; // No more prayers today
-
-      // Calculate timeout to next prayer (trigger 500ms before for safety)
-      const timeUntilPrayer = nextPrayerTime - now - 500;
-      
-      console.log(`[Adhan] Next prayer in ${timeUntilPrayer}ms`);
-
-      const timeout = setTimeout(() => {
-        const checkAndPlayAtPreciseTime = async () => {
-          const currentTime = Date.now();
-          const windowMs = 10 * 1000; // 10 second window
-
-          for (const prayer of prayers) {
-            if (prayer.name === "Sunrise") continue;
-
-            const prayerKey = `${prayer.name}-${new Date(prayer.timestamp).toDateString()}`;
-            if (lastPlayedRef.current === prayerKey) continue;
-
-            // Check if we're within 10 seconds of prayer time
-            const shouldPlay =
-              currentTime >= prayer.timestamp && currentTime < prayer.timestamp + windowMs;
-
-            if (!shouldPlay) continue;
-
-            if (
-              (prayer.name === "Fajr" && !settings.notificationFajr) ||
-              (prayer.name === "Dhuhr" && !settings.notificationDhuhr) ||
-              (prayer.name === "Asr" && !settings.notificationAsr) ||
-              (prayer.name === "Maghrib" && !settings.notificationMaghrib) ||
-              (prayer.name === "Isha" && !settings.notificationIsha)
-            ) {
-              continue;
-            }
-
-            lastPlayedRef.current = prayerKey;
-            try {
-              console.log(`[Adhan] Playing adhan for ${prayer.name} at ${new Date(prayer.timestamp).toLocaleTimeString()}`);
-              await PrayerAPI.playSelectedAdhan();
-            } catch (error) {
-              console.error("[Adhan] Failed to play adhan:", error);
-            }
-            break;
-          }
-        };
-
-        checkAndPlayAtPreciseTime();
-        
-        // Re-setup for next prayer after this one completes
-        setupPreciseNotifications();
-      }, Math.max(0, timeUntilPrayer));
-
-      return () => clearTimeout(timeout);
-    };
-
-    const cleanup = setupPreciseNotifications();
-    return () => {
-      if (cleanup) cleanup();
-    };
-  }, [settings, prayers]);
-
-  // Listen for notification events to play adhan when notification is shown
-  useEffect(() => {
-    console.log('[Adhan] Notification listener effect triggered. Platform:', Capacitor.getPlatform(), 
-      'Notifications enabled:', settings?.notificationsEnabled, 
-      'Play adhan on notification:', settings?.playAdhanOnNotification);
-    
-    if (!Capacitor.isNativePlatform()) return;
-    if (!settings?.notificationsEnabled) return;
-    if (!settings?.playAdhanOnNotification) return;
-
-    let removeReceivedListener: (() => void) | undefined;
-    let removeActionListener: (() => void) | undefined;
-
-    const setupListeners = async () => {
-      try {
-        console.log('[Adhan] Setting up notification listeners...');
-        
-        // Listener for when notification is received (foreground)
-        const receivedListener = await LocalNotifications.addListener(
-          'localNotificationReceived',
-          async (notification) => {
-            console.log('[Adhan] localNotificationReceived event fired:', notification);
-            // Play adhan when notification is received
-            if (notification.notification.channelId === 'prayer') {
-              try {
-                console.log('[Adhan] Playing adhan from localNotificationReceived...');
-                await PrayerAPI.playSelectedAdhan();
-              } catch (error) {
-                console.error('[Adhan] Failed to play adhan from localNotificationReceived:', error);
-              }
-            }
-          }
-        );
-        removeReceivedListener = () => receivedListener.remove();
-
-        // Listener for when notification action is performed (tapped/interacted)
-        const actionListener = await LocalNotifications.addListener(
-          'localNotificationActionPerformed',
-          async (notification) => {
-            console.log('[Adhan] localNotificationActionPerformed event fired:', notification);
-            // Play adhan when notification is tapped
-            if (notification.notification.channelId === 'prayer') {
-              try {
-                console.log('[Adhan] Playing adhan from localNotificationActionPerformed...');
-                await PrayerAPI.playSelectedAdhan();
-              } catch (error) {
-                console.error('[Adhan] Failed to play adhan from localNotificationActionPerformed:', error);
-              }
-            }
-          }
-        );
-        removeActionListener = () => actionListener.remove();
-        
-        console.log('[Adhan] Notification listeners set up successfully');
-      } catch (error) {
-        console.error('[Adhan] Failed to setup notification listeners:', error);
-      }
-    };
-
-    setupListeners();
-    return () => {
-      console.log('[Adhan] Cleaning up notification listeners');
-      if (removeReceivedListener) removeReceivedListener();
-      if (removeActionListener) removeActionListener();
-    };
-  }, [settings?.notificationsEnabled, settings?.playAdhanOnNotification]);
 
   return <RouterProvider router={router} key={settings?.language} />;
 }

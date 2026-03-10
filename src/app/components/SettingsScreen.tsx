@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronRight, Volume2, Book, Calculator, Bell, Shield, RotateCcw, Upload, Play, Square, LayoutGrid } from "lucide-react";
+import { ChevronRight, Volume2, Book, Calculator, Bell, Shield, RotateCcw, Play, Square, LayoutGrid } from "lucide-react";
 import { motion } from "motion/react";
 import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
@@ -34,7 +34,6 @@ export function SettingsScreen() {
   const adhanOptions = [
     { filename: "default.mp3", name: t.defaultAdhan, icon: Volume2, description: t.traditionalAdhan },
     { filename: "madinah.mp3", name: t.madinahAdhan, icon: Volume2, description: t.madinahStyle },
-    { filename: "custom", name: t.uploadCustom, icon: Upload, description: t.uploadYourOwn },
   ];
 
   const suggestedMethod = activeLocation
@@ -85,32 +84,6 @@ export function SettingsScreen() {
     { key: Madhab.HANBALI, label: t.hanbali },
   ];
 
-  const handleUploadCustom = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'audio/*';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        try {
-          const url = URL.createObjectURL(file);
-          await PrayerAPI.adhan.add({
-            name: file.name.replace(/\.[^/.]+$/, ""),
-            filename: file.name,
-            path: url,
-            duration: 0,
-          });
-          await updateSettings({ adhanSound: file.name });
-          alert('Custom adhan uploaded successfully!');
-        } catch (error) {
-          console.error('Failed to upload custom adhan:', error);
-          alert('Failed to upload custom adhan.');
-        }
-      }
-    };
-    input.click();
-  };
-
   const handleAdhanSelect = async (filename: string) => {
     try {
       await updateSettings({ adhanSound: filename });
@@ -124,7 +97,7 @@ export function SettingsScreen() {
       if (playingPreview === filename || isPlaying) {
         await stop();
         setPlayingPreview(null);
-      } else if (filename !== 'custom') {
+      } else {
         await play(filename);
         setPlayingPreview(filename);
         setTimeout(async () => {
@@ -252,13 +225,7 @@ export function SettingsScreen() {
             return (
               <div
                 key={option.filename}
-                onClick={() => {
-                  if (option.filename === 'custom') {
-                    handleUploadCustom();
-                  } else {
-                    handleAdhanSelect(option.filename);
-                  }
-                }}
+                onClick={() => handleAdhanSelect(option.filename)}
                 className={`
                   w-full p-4 rounded-2xl border-2 transition-all cursor-pointer
                   ${
@@ -295,8 +262,7 @@ export function SettingsScreen() {
                     </p>
                   </div>
 
-                  {option.filename !== 'custom' && (
-                    <button
+                  <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAdhanPreview(option.filename);
@@ -326,7 +292,6 @@ export function SettingsScreen() {
                         />
                       )}
                     </button>
-                  )}
 
                   <div
                     className={`
